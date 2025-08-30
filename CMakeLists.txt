@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.15)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
+cmake_minimum_required(VERSION 3.15)
 project(
-  Root
+  temp
   VERSION 1.0
-  DESCRIPTION "root"
+  DESCRIPTION "temp"
   LANGUAGES CXX
 )
 
@@ -17,5 +17,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Enable folders in IDEs
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-
+add_subdirectory(engine)
 add_subdirectory(server)
+add_subdirectory(client)

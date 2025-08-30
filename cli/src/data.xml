@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Minimal OpenSCENARIO-style template for implementation.
+  Replace placeholders (e.g., YOUR_SCENARIO_NAME, ego_model) as needed.
+  This is intended as a practical starting point — adapt to your simulator's
+  required catalog names and schema specifics.
+-->
+<OpenSCENARIO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="OpenSCENARIO.xsd">
+
+  <!-- Basic file metadata -->
+  <FileHeader description="Base scenario template"
+              author="Your Name"
+              date="2025-08-11"
+              revMajor="1"
+              revMinor="0"
+              revPatch="0"/>
+
+  <!-- Optional: global parameters for easy tuning -->
+  <ParameterDeclarations>
+    <!-- Example parameters you can reference elsewhere using $paramName -->
+    <ParameterDeclaration name="ego_speed" parameterType="double" value="10.0"/>
+    <ParameterDeclaration name="other_speed" parameterType="double" value="8.0"/>
+  </ParameterDeclarations>
+
+  <!-- CatalogLocations / Catalogs (optional) -->
+  <CatalogLocations/>
+  <Catalogs/>
+
+  <!-- Entities: scenario objects (ego vehicle, other vehicles, pedestrians, etc.) -->
+  <Entities>
+    <!-- Ego vehicle -->
+    <ScenarioObject name="EgoVehicle">
+      <Vehicle category="car" name="ego_model">
+        <!-- optionally reference a vehicle model from a catalog -->
+      </Vehicle>
+      <!-- initial position can be set in the Storyboard->Init section -->
+    </ScenarioObject>
+
+    <!-- Another vehicle (opponent) -->
+    <ScenarioObject name="OtherVehicle">
+      <Vehicle category="car" name="npc_model"/>
+    </ScenarioObject>
+  </Entities>
+
+  <!-- The actual scenario flow: initialization, stories, maneuvers, goals -->
+  <Storyboard>
+    <!-- Init: set positions, environment, and initial actions -->
+    <Init>
+      <Actions>
+        <!-- Set initial pose for EgoVehicle -->
+        <PrivateAction vehicle="EgoVehicle">
+          <TeleportAction>
+            <Position>
+              <WorldPosition x="0" y="0" z="0"/>
+            </Position>
+          </TeleportAction>
+        </PrivateAction>
+
+        <!-- Set initial pose for OtherVehicle (50m ahead, same lane) -->
+        <PrivateAction vehicle="OtherVehicle">
+          <TeleportAction>
+            <Position>
+              <WorldPosition x="50" y="0" z="0"/>
+            </Position>
+          </TeleportAction>
+        </PrivateAction>
+
+        <!-- Environment example: set weather or timeOfDay if supported by runtime -->
+        <!--
+        <EnvironmentAction>
+          ...
+        </EnvironmentAction>
+        -->
+      </Actions>
+    </Init>
+
+    <!-- One Story with a single Act. Add more stories/acts/maneuvers for complex scenarios. -->
+    <Story name="MainStory">
+      <Act>
+        <Maneuver name="MainManeuver">
+          <Event name="EgoStartMoving" priority="overwrite">
+            <Actions>
+              <!-- Ego longitudinal: set speed from parameter ego_speed -->
+              <PrivateAction vehicle="EgoVehicle">
+                <LongitudinalAction>
+                  <SpeedAction>
+                    <SpeedActionTarget>
+                      <AbsoluteTargetSpeed value="$ego_speed"/>
+                    </SpeedActionTarget>
+                    <!-- dynamics or continuous profile can be added -->
+                  </SpeedAction>
+                </LongitudinalAction>
+              </PrivateAction>
+
+              <!-- Other vehicle moves at other_speed -->
+              <PrivateAction vehicle="OtherVehicle">
+                <LongitudinalAction>
+                  <SpeedAction>
+                    <SpeedActionTarget>
+                      <AbsoluteTargetSpeed value="$other_speed"/>
+                    </SpeedActionTarget>
+                  </SpeedAction>
+                </LongitudinalAction>
+              </PrivateAction>
+            </Actions>
+
+            <!-- Conditions for the event's end / success (optional) -->
+            <StartConditions>
+              <!-- start immediately -->
+              <Condition name="immediate" delay="0" conditionEdge="rising">
+                <ByValueCondition>
+                  <Rule>
+                    <ConditionEdge>rising</ConditionEdge>
+                    <ValueCondition>
+                      <Value>1</Value> <!-- trivial true -->
+                    </ValueCondition>
+                  </Rule>
+                </ByValueCondition>
+              </Condition>
+            </StartConditions>
+
+            <StopConditions>
+              <!-- Example stop: when Ego has travelled 45 meters (if supported) -->
+              <Condition name="ego_pass_45m" delay="0" conditionEdge="falling">
+                <ByValueCondition>
+                  <Rule>
+                    <ConditionEdge>falling</ConditionEdge>
+                    <ValueCondition>
+                      <Value>0</Value> <!-- placeholder; replace with proper distance condition for target runtime -->
+                    </ValueCondition>
+                  </Rule>
+                </ByValueCondition>
+              </Condition>
+            </StopConditions>
+
+          </Event>
+        </Maneuver>
+      </Act>
+    </Story>
+
+    <!-- EndOfStory/StopTrigger (scenario termination) -->
+    <StopTrigger>
+      <ConditionGroup>
+        <Condition name="end_when_other_passes_100m" delay="0" conditionEdge="rising">
+          <!-- Replace this generic condition with a distance/time/object-state condition supported by your engine -->
+          <ByValueCondition>
+            <Rule>
+              <ConditionEdge>rising</ConditionEdge>
+              <ValueCondition>
+                <Value>0</Value>
+              </ValueCondition>
+            </Rule>
+          </ByValueCondition>
+        </Condition>
+      </ConditionGroup>
+    </StopTrigger>
+
+  </Storyboard>
+</OpenSCENARIO>

@@ -1,9 +1,9 @@
-add_executable(Server
+add_executable(server
   src/main.cpp
 )
 
-#target_link_libraries(Server PRIVATE
-#  JobSchedulerCore
-#)
+target_link_libraries(server PRIVATE
+  engine
+)
 
-install(TARGETS Server DESTINATION bin)
+install(TARGETS server DESTINATION bin)
